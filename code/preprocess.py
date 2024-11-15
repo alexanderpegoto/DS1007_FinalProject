@@ -17,4 +17,11 @@ def merge_parquets(dir):
     return full_data
 
 
+def sample_dat(dat, prop):
+    """
+    
+    """
+    sample_idx = np.random.randint(0, len(dat), int(len(dat) * prop))
+    return dat.iloc[sample_indx]
+
 
