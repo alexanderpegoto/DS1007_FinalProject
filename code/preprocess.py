@@ -38,5 +38,6 @@ def drop_missing_vals(dat, column):
 
 
 
-
+### Create a function that would filter out the fare amount outliers 
+## Filter for fare amount > 0 
 
