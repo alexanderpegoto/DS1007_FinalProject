@@ -18,6 +18,7 @@ def merge_parquets(dir):
     full_data = full_data[full_data.columns[:-1]]
     # Make sure there are no duplicate rows in the dataset 
     full_data.drop_duplicates(inplace = True)
+    full_data = full_data[full_data['total_amount'] > 0]
     return full_data
 
 
