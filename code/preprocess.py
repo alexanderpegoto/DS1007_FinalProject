@@ -37,7 +37,47 @@ def drop_missing_vals(dat, column):
     return dat_na_dropped 
 
 
+def extract_dt(date):
+    """
+    return month, hour, weekday of a date field 
+    """
+    month = date.dt.month
+    hour = date.dt.hour 
+    weekname = date.dt.day_name() 
+    date = date.dt.date
+
+    return date, month, hour, weekname 
+
+def split_hours(hour):
+    conditions = [
+    (hour >= 6) & (hour < 10),
+    (hour >= 10) & (hour< 16),
+    (hour >= 16) & (hour < 20),
+    (hour >= 20) | (hour < 6)
+]
+    choices = ['1.Morning (6am-10am)', '2.Midday (10am - 4pm)', '3.Evening Rush (4pm - 7pm)', '4.Night (8pm - 5am)']
+    return np.select(conditions, choices)
+
+
+
 
 ### Create a function that would filter out the fare amount outliers 
 ## Filter for fare amount > 0 
 
+def remove_outliers(group, column):
+    Q1 = group[column].quantile(0.25)
+    Q3 = group[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    return group[(group[column] >= lower_bound) & 
+                 (group[column] <= upper_bound)]
+
+## Run below to remove outliers in trip distance, duration, and fares
+
+# sampled_dat['time_duration_in_mins'] = (sampled_dat['tpep_dropoff_datetime'] - sampled_dat['tpep_pickup_datetime']).dt.seconds // 60
+# sampled_dat['trip_distance_round'] = np.floor(sampled_dat['trip_distance'])
+
+# sampled_dat2 = sampled_dat.groupby('trip_distance_round', group_keys=False).apply(lambda group: remove_outliers(group, 'total_amount'))
+# sampled_dat2 = sampled_dat2.groupby('trip_distance_round', group_keys=False).apply(lambda group: remove_outliers(group, 'time_duration_in_mins'))
+# sampled_dat2 = sampled_dat2.groupby('time_duration_in_mins', group_keys=False).apply(lambda group: remove_outliers(group, 'trip_distance_round'))
