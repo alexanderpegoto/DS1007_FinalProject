@@ -1,6 +1,3 @@
-latitude,longitude,elevation,utc_offset_seconds,timezone,timezone_abbreviation
-40.738136,-74.04254,51.0,0,GMT,GMT
-
 time,temperature_2m (°C),precipitation (mm),rain (mm),snowfall (cm)
 2023-01-01T00:00,8.7,0.40,0.40,0.00
 2023-01-01T01:00,10.8,1.10,1.10,0.00
