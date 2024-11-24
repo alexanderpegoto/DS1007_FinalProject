@@ -1,22 +1,39 @@
 import numpy as np
-import pandas as pd 
-from pathlib import Path 
-import os 
+import pandas as pd
+from pathlib import Path
+import os
 
 def merge_parquets(dir):
     """
-    Read and Merge all the parquet files 
+    Reads and merges all Parquet files in a specified directory into a single Pandas DataFrame.
+
+    The function performs the following operations:
+    1. Reads all `.parquet` files in the given directory.
+    2. Concatenates the data from all files into a single DataFrame.
+    3. Removes duplicate rows to ensure data uniqueness.
+    4. Filters out rows where the `total_amount` column has non-positive values.
+
+    Parameters:
+    ----------
+    dir : str
+        The directory path containing the `.parquet` files to be merged.
+
+    Returns:
+    -------
+    pd.DataFrame
+        A merged DataFrame containing data from all `.parquet` files,
+        with duplicate rows removed and filtered based on the `total_amount` column.
     """
-    # setting appropriate file path 
+    # setting appropriate file path
     data_dir = Path(dir)
-    
-    # concatenate all the parquet files and merge them 
+
+    # concatenate all the parquet files and merge them
     full_data = pd.concat(
-        pd.read_parquet(parquet_file) 
+        pd.read_parquet(parquet_file)
         for parquet_file in data_dir.glob('*.parquet')
     )
     full_data = full_data[full_data.columns[:-1]]
-    # Make sure there are no duplicate rows in the dataset 
+    # Make sure there are no duplicate rows in the dataset
     full_data.drop_duplicates(inplace = True)
     full_data = full_data[full_data['total_amount'] > 0]
     return full_data
@@ -24,9 +41,9 @@ def merge_parquets(dir):
 
 def sample_dat(dat, prop):
     """
-    docstring 
+    docstring
     """
-    # uniform sample of the indices 
+    # uniform sample of the indices
     sample_idx = np.random.randint(0, len(dat), int(len(dat) * prop))
     return dat.iloc[sample_idx]
 
@@ -34,20 +51,20 @@ def drop_missing_vals(dat, column):
     """
     docstring
     """
-    dat_na_dropped = dat[dat[column].notnull()] 
-    return dat_na_dropped 
+    dat_na_dropped = dat[dat[column].notnull()]
+    return dat_na_dropped
 
 
 def extract_dt(date):
     """
-    return month, hour, weekday of a date field 
+    return month, hour, weekday of a date field
     """
     month = date.dt.month
-    hour = date.dt.hour 
-    weekname = date.dt.day_name() 
+    hour = date.dt.hour
+    weekname = date.dt.day_name()
     date = date.dt.date
 
-    return date, month, hour, weekname 
+    return date, month, hour, weekname
 
 def split_hours(hour):
     conditions = [
@@ -62,8 +79,8 @@ def split_hours(hour):
 
 
 
-### Create a function that would filter out the fare amount outliers 
-## Filter for fare amount > 0 
+### Create a function that would filter out the fare amount outliers
+## Filter for fare amount > 0
 
 def remove_outliers(group, column):
     Q1 = group[column].quantile(0.25)
@@ -71,7 +88,7 @@ def remove_outliers(group, column):
     IQR = Q3 - Q1
     lower_bound = Q1 - 1.5 * IQR
     upper_bound = Q3 + 1.5 * IQR
-    return group[(group[column] >= lower_bound) & 
+    return group[(group[column] >= lower_bound) &
                  (group[column] <= upper_bound)]
 
 ## Run below to remove outliers in trip distance, duration, and fares
