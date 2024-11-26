@@ -1,10 +1,3 @@
-
-
-
-## Visualization format 
-## Title, axis labels, axis ticks, legend, gridlines (optional), 
-
-
 def boxplot(dat, xvar, yvar, title, xlabel, ylabel):
     """
     Creates a boxplot to visualize the distribution of a variable across categories.
@@ -64,22 +57,31 @@ def heatmap(data, title, xlabel, ylabel):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
 
-def lineplot(x, y, title, xlabel, ylabel):
+def lineplot(x, y, title, xlabel, ylabel, use_seaborn = False, data = None, hue = None):
     """
-    Creates a simple line plot to visualize trends or relationships between two variables.
+     Creates a line plot to visualize trends or relationships between two variables.
+
+    This function supports both Matplotlib and Seaborn plotting libraries, allowing for 
+    grouped line plots with Seaborn's `hue` parameter.
 
     Parameters:
     ----------
-    x : array-like
-        The data for the X-axis.
-    y : array-like
-        The data for the Y-axis.
+    x : array-like or str
+        The data for the X-axis. 
+    y : array-like or str
+        The data for the Y-axis. 
     title : str
         The title of the plot.
     xlabel : str
         The label for the X-axis.
     ylabel : str
         The label for the Y-axis.
+    use_seaborn : bool, optional (default=False)
+        Whether to use Seaborn for the plot. If True, additional arguments like `data` and `hue` are used.
+    data : pd.DataFrame, optional
+        The input DataFrame for Seaborn plots. Required if `use_seaborn` is True.
+    hue : str, optional
+        The column name in `data` for grouping in Seaborn plots. Ignored if `use_seaborn` is False.
 
     Returns:
     -------
@@ -87,11 +89,15 @@ def lineplot(x, y, title, xlabel, ylabel):
         Displays the line plot.
     """
     plt.figure(figsize=(16, 8))
-    plt.plot(x,y, color = 'blue')
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.grid(True)
-    plt.xticks(rotation =45)
-    plt.tight_layout()
-    plt.show()
+    if use_seaborn:
+        sns.lineplot(data=data,x=x,y=y,hue=hue, palette="tab10",linewidth=2)
+        plt.legend(title=hue)
+    else:
+        plt.plot(x,y, color = 'blue')
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.grid(True)
+        plt.xticks(rotation =45)
+        plt.tight_layout()
+        plt.show()
