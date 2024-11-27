@@ -7,17 +7,10 @@ def merge_parquets(dir):
     """
     Reads and merges all Parquet files in a specified directory into a single Pandas DataFrame.
 
-    The function performs the following operations:
-    1. Reads all `.parquet` files in the given directory.
-    2. Concatenates the data from all files into a single DataFrame.
-    3. Removes duplicate rows to ensure data uniqueness.
-    4. Filters out rows where the `total_amount` column has non-positive values.
-
     Parameters:
     ----------
     dir : str
         The directory path containing the `.parquet` files to be merged.
-
     Returns:
     -------
     pd.DataFrame
@@ -28,10 +21,15 @@ def merge_parquets(dir):
     data_dir = Path(dir)
 
     # concatenate all the parquet files and merge them
+    relevant_files = [
+        parquet_file for parquet_file in data_dir.glob('*.parquet')
+        if 'yellow_tripdata_' in parquet_file.name
+    ]
+
     full_data = pd.concat(
-        pd.read_parquet(parquet_file)
-        for parquet_file in data_dir.glob('*.parquet')
+        pd.read_parquet(parquet_file) for parquet_file in relevant_files
     )
+    print("concatenating all yellow_tripdata parquets")
     full_data = full_data[full_data.columns[:-1]]
     # Make sure there are no duplicate rows in the dataset
     full_data.drop_duplicates(inplace = True)
@@ -39,25 +37,73 @@ def merge_parquets(dir):
     return full_data
 
 
-def sample_dat(dat, prop):
+def sample_dat(dat, prop, seed):
     """
-    docstring
+    Samples a proportion of rows from the dataset.
+
+    Parameters:
+    ----------
+    dat : pd.DataFrame
+        The dataset to sample from.
+    prop : float
+        Proportion of rows to sample (0 < prop <= 1).
+    seed : int
+        Random seed for reproducibility.
+
+    Returns:
+    -------
+    pd.DataFrame
+        A sampled DataFrame.
     """
-    # uniform sample of the indices
+    # Set random seed
+    np.random.seed(seed) # use seed = 1
+
+    # Generate sample indices and return sampled data
     sample_idx = np.random.randint(0, len(dat), int(len(dat) * prop))
     return dat.iloc[sample_idx]
 
 def drop_missing_vals(dat, column):
     """
-    docstring
+    Drops rows with missing values in a specified column.
+
+    Parameters:
+    ----------
+    dat : pd.DataFrame
+        The dataset to clean.
+    column : str
+        Column to check for missing values.
+
+    Returns:
+    -------
+    pd.DataFrame
+        A DataFrame with rows containing missing values in the specified column removed.
     """
+
     dat_na_dropped = dat[dat[column].notnull()]
     return dat_na_dropped
 
 
 def extract_dt(date):
     """
-    return month, hour, weekday of a date field
+    Extracts date components including month, hour, weekday name, and the raw date from a datetime field.
+
+    Parameters:
+    ----------
+    date : pd.Series
+        A pandas Series containing datetime values.
+
+    Returns:
+    -------
+    tuple
+        A tuple containing:
+        - date : pd.Series
+            The date component (YYYY-MM-DD)
+        - month : pd.Series
+            The month component (1–12)
+        - hour : pd.Series
+            The hour component (0–23)
+        - weekname : pd.Series
+            The day name
     """
     month = date.dt.month
     hour = date.dt.hour
@@ -67,6 +113,23 @@ def extract_dt(date):
     return date, month, hour, weekname
 
 def split_hours(hour):
+    """
+    Categorizes hours of the day into predefined time periods.
+
+    Parameters:
+    ----------
+    hour : array-like
+        A pandas Series or array containing hour values (0–23) representing the time of day.
+
+    Returns:
+    -------
+    np.ndarray
+        A numpy array with time period labels for each hour:
+        - 1.Morning (6am-10am)
+        - 2.Midday (10am - 4pm)
+        - 3.Evening Rush (4pm - 7pm)
+        - 4.Night (8pm - 5am)
+    """
     conditions = [
     (hour >= 6) & (hour < 10),
     (hour >= 10) & (hour< 16),
@@ -77,12 +140,22 @@ def split_hours(hour):
     return np.select(conditions, choices)
 
 
-
-
-### Create a function that would filter out the fare amount outliers
-## Filter for fare amount > 0
-
 def remove_outliers(group, column):
+    """
+    Removes outliers from a specified column using the IQR method.
+
+    Parameters:
+    ----------
+    group : pd.DataFrame
+        The dataset to remove outliers.
+    column : str
+        Column to remove outliers from.
+
+    Returns:
+    -------
+    pd.DataFrame
+        A DataFrame with outliers removed from the specified column.
+    """
     Q1 = group[column].quantile(0.25)
     Q3 = group[column].quantile(0.75)
     IQR = Q3 - Q1
@@ -90,6 +163,44 @@ def remove_outliers(group, column):
     upper_bound = Q3 + 1.5 * IQR
     return group[(group[column] >= lower_bound) &
                  (group[column] <= upper_bound)]
+
+
+def merge_with_weather(main_data, weather_path, save_path):
+    """
+    Merges the main dataset with weather data on date and hour, and saves the result locally.
+
+    Parameters:
+    ----------
+    main_data : pd.DataFrame
+        The main dataset (already cleaned and sampled).
+    weather_path : str
+        Path to the weather dataset.
+    save_path : str
+        Path to save the merged dataset.
+
+    Returns:
+    -------
+    pd.DataFrame
+        The merged dataset.
+    """
+    # Load weather data
+    weather_df = pd.read_csv(weather_path, parse_dates=['time'])
+
+    # Extract date and hour from both datasets
+    main_data['date'] = main_data['tpep_pickup_datetime'].dt.date
+    main_data['hour'] = main_data['tpep_pickup_datetime'].dt.hour
+    weather_df['date'] = weather_df['time'].dt.date
+    weather_df['hour'] = weather_df['time'].dt.hour
+
+    # Merge datasets
+    merged_data = pd.merge(main_data, weather_df, on=['date', 'hour'], how='inner')
+
+    # Save the merged dataset locally
+    merged_data.to_parquet(save_path, index=False)
+
+    return merged_data
+
+
 
 ## Run below to remove outliers in trip distance, duration, and fares
 
@@ -99,3 +210,6 @@ def remove_outliers(group, column):
 # sampled_dat2 = sampled_dat.groupby('trip_distance_round', group_keys=False).apply(lambda group: remove_outliers(group, 'total_amount'))
 # sampled_dat2 = sampled_dat2.groupby('trip_distance_round', group_keys=False).apply(lambda group: remove_outliers(group, 'time_duration_in_mins'))
 # sampled_dat2 = sampled_dat2.groupby('time_duration_in_mins', group_keys=False).apply(lambda group: remove_outliers(group, 'trip_distance_round'))
+
+
+# Q3 Preprocessing
