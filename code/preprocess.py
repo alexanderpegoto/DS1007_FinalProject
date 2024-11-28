@@ -137,7 +137,7 @@ def split_hours(hour):
     (hour >= 20) | (hour < 6)
 ]
     choices = ['1.Morning (6am-10am)', '2.Midday (10am - 4pm)', '3.Evening Rush (4pm - 7pm)', '4.Night (8pm - 5am)']
-    return np.select(conditions, choices)
+    return np.select(conditions, choices, default="Unknown")
 
 
 def remove_outliers(group, column):
