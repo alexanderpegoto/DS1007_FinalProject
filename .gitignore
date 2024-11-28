@@ -1,0 +1,22 @@
+# Exclude the virtual environment folder
+venv/
+
+# Exclude data files (e.g., large or sensitive files)
+data/
+
+# Ignore heavy files, temporary files, and logs
+*.parquet
+*.csv
+*.log
+*.tmp
+*.checkpoint
+*.ipynb_checkpoints/
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore Jupyter Notebook config and runtime files
+.ipynb_checkpoints/
+.jupyter/
