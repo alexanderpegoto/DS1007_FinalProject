@@ -11,8 +11,9 @@ def decompose(dat, column):
     dat.set_index(column, inplace = True)
     stl = STL(dat, seasonal = 7)
     result = stl.fit()
-    plt.figure(figsize = (10,13))
+    plt.figure(figsize = (15,15))
     result.plot()
+    plt.xticks(rotation=45)
     plt.show()
     return result.seasonal
 
