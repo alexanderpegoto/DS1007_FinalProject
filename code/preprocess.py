@@ -3,14 +3,18 @@ import pandas as pd
 from pathlib import Path
 import os
 
-def merge_parquets(dir):
+def merge_parquets(dir, output_file_name='data.parquet'):
     """
-    Reads and merges all Parquet files in a specified directory into a single Pandas DataFrame.
+    Reads and merges all Parquet files into a single Pandas DataFrame. It saves this merged DataFrame in the data folder
+    for posterior use.
 
     Parameters:
     ----------
     dir : str
         The directory path containing the `.parquet` files to be merged.
+    output_file_name : str, optional
+        The name of the output file where the merged data will be saved. Default is 'merged_data.parquet'.
+
     Returns:
     -------
     pd.DataFrame
@@ -19,21 +23,34 @@ def merge_parquets(dir):
     """
     # setting appropriate file path
     data_dir = Path(dir)
+    output_file_path = data_dir / output_file_name
+
+    # Check if the merged file already exists
+    if output_file_path.exists():
+        print(f"{output_file_name} already exists. Loading the file...")
+        return pd.read_parquet(output_file_path)
 
     # concatenate all the parquet files and merge them
     relevant_files = [
         parquet_file for parquet_file in data_dir.glob('*.parquet')
         if 'yellow_tripdata_' in parquet_file.name
     ]
-
+    # Concatenate all relevant parquet files
+    print("Concatenating all yellow_tripdata parquets...")
     full_data = pd.concat(
         pd.read_parquet(parquet_file) for parquet_file in relevant_files
     )
-    print("concatenating all yellow_tripdata parquets")
     full_data = full_data[full_data.columns[:-1]]
-    # Make sure there are no duplicate rows in the dataset
-    full_data.drop_duplicates(inplace = True)
+
+    # Remove duplicates and filter rows
+    print("Removing duplicates and filtering invalid rows...")
+    full_data.drop_duplicates(inplace=True)
     full_data = full_data[full_data['total_amount'] > 0]
+
+    # Save the merged data to a Parquet file
+    print(f"Saving merged data to {output_file_name}...")
+    full_data.to_parquet(output_file_path)
+
     return full_data
 
 
