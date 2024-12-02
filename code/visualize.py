@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns 
 
 
-def boxplot(dat, xvar, yvar, title, xlabel, ylabel):
+def boxplot(dat, xvar, yvar, title, xlabel, ylabe, x_order = None):
     """
     Creates a boxplot to visualize the distribution of a variable across categories.
 
@@ -20,6 +20,8 @@ def boxplot(dat, xvar, yvar, title, xlabel, ylabel):
         The label for the X-axis.
     ylabel : str
         The label for the Y-axis.
+    x_order : list, optional
+        The desired order of categories on the X-axis.
 
     Returns:
     -------
@@ -27,7 +29,7 @@ def boxplot(dat, xvar, yvar, title, xlabel, ylabel):
         Displays the boxplot.
     """
     plt.figure(figsize = (10,10))
-    sns.boxplot(x= xvar, y= yvar, data = dat, palette='Set3')
+    sns.boxplot(x= xvar, y= yvar, data = dat, palette='Set3', order = x_order)
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
