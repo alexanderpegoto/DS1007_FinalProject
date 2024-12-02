@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt 
-import seaborn as sns 
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def boxplot(dat, xvar, yvar, title, xlabel, ylabel):
@@ -65,15 +65,15 @@ def lineplot(x, y, title, xlabel, ylabel, use_seaborn = False, data = None, hue 
     """
      Creates a line plot to visualize trends or relationships between two variables.
 
-    This function supports both Matplotlib and Seaborn plotting libraries, allowing for 
+    This function supports both Matplotlib and Seaborn plotting libraries, allowing for
     grouped line plots with Seaborn's `hue` parameter.
 
     Parameters:
     ----------
     x : array-like or str
-        The data for the X-axis. 
+        The data for the X-axis.
     y : array-like or str
-        The data for the Y-axis. 
+        The data for the Y-axis.
     title : str
         The title of the plot.
     xlabel : str
@@ -105,3 +105,35 @@ def lineplot(x, y, title, xlabel, ylabel, use_seaborn = False, data = None, hue 
         plt.xticks(rotation =45)
         plt.tight_layout()
         plt.show()
+
+def plot_bar(data, x, y, title, xlabel, ylabel):
+    """
+    Plots a bar chart for the given data.
+
+    Parameters:
+    ----------
+    data : pd.DataFrame
+        DataFrame containing the data to plot.
+    x : str
+        Column name for the x-axis.
+    y : str
+        Column name for the y-axis.
+    title : str
+        Title of the chart.
+    xlabel : str
+        Label for the x-axis.
+    ylabel : str
+        Label for the y-axis.
+    color : str, optional
+        Bar color (default is 'blue').
+
+    Returns:
+    -------
+    None
+    """
+    plt.figure(figsize=(8, 5))
+    plt.bar(data[x], data[y], color='blue')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.show()
