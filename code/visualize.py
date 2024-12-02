@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns 
 
 
-def boxplot(dat, xvar, yvar, title, xlabel, ylabe, x_order = None):
+def boxplot(dat, xvar, yvar, title, xlabel, ylabel, x_order = None):
     """
     Creates a boxplot to visualize the distribution of a variable across categories.
 
