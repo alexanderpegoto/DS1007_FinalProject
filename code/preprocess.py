@@ -76,7 +76,7 @@ def sample_dat(dat, prop, seed):
     np.random.seed(seed) # use seed = 1
 
     # Generate sample indices and return sampled data
-    sample_idx = np.random.randint(0, len(dat), int(len(dat) * prop))
+    sample_idx = np.random.choice(np.arange(0, len(dat)), size = int(len(dat) * prop), replace=False) 
     return dat.iloc[sample_idx]
 
 def drop_missing_vals(dat, column):
