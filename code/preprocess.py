@@ -76,7 +76,7 @@ def sample_dat(dat, prop, seed):
     np.random.seed(seed) # use seed = 1
 
     # Generate sample indices and return sampled data
-    sample_idx = np.random.choice(np.arange(0, len(dat)), size = int(len(dat) * prop), replace=False) 
+    sample_idx = np.random.choice(np.arange(0, len(dat)), size = int(len(dat) * prop), replace=False)
     return dat.iloc[sample_idx]
 
 def drop_missing_vals(dat, column):
@@ -218,6 +218,45 @@ def merge_with_weather(main_data, weather_path, save_path):
     return merged_data
 
 
+def temperature_categories(temperature):
+    """
+    Categorizes temperature values into defined ranges.
+
+    Parameters:
+    -----------
+    temperature : array
+        An array or series of temperature values (in °C) to be categorized.
+
+    Returns:
+    --------
+    array
+        A series or array with temperature categories:
+        - 'Warm (>=15)' for temperatures 15°C and above.
+    """
+    conditions = [(temperature < 15),
+                  (temperature >= 15)]
+    choices = ['Cold/Moderate (<15)', 'Warm (>=15)']
+    return np.select(conditions, choices, default='Unknown')
+
+def categorize_weather(data, column_name, threshold=0):
+    """
+    Categorizes weather conditions based on precipitation values.
+
+    Parameters:
+    ----------
+    data : pd.DataFrame
+        DataFrame containing weather data.
+    column_name : str
+        Column name for precipitation data.
+    threshold : float, optional
+        Precipitation threshold to distinguish between categories (default is 0).
+
+    Returns:
+    -------
+    pd.Series
+        Categorical weather conditions.
+    """
+    return np.where(data[column_name] > threshold, "Precipitation", "No Precipitation (Clear)")
 
 ## Run below to remove outliers in trip distance, duration, and fares
 
