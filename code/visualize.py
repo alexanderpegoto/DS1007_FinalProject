@@ -139,3 +139,58 @@ def plot_bar(data, x, y, title, xlabel, ylabel):
     plt.ylabel(ylabel)
     plt.title(title)
     plt.show()
+
+
+def barplot_with_annotations(data, x, mean_col, median_col, title, xlabel, ylabel):
+    """
+    Plots a combined bar chart with mean and median values and adds annotations.
+
+    Parameters:
+    ----------
+    data : pd.DataFrame
+        The dataset containing the values for the plot.
+    x : str
+        The column name for the x-axis (categorical variable).
+    mean_col : str
+        The column name for the mean values.
+    median_col : str
+        The column name for the median values.
+    title : str
+        Title of the chart.
+    xlabel : str
+        Label for the x-axis.
+    ylabel : str
+        Label for the y-axis.
+
+    Returns:
+    -------
+    None
+        Displays the bar chart with annotations.
+    """
+    plt.figure(figsize=(12, 8))
+
+    # Plot Mean Fare
+    mean_bars = sns.barplot(data=data, x=x, y=mean_col, color='skyblue', label='Mean Fare')
+
+    # Overlay Median Fare as a barplot
+    median_bars = sns.barplot(data=data, x=x, y=median_col, color='lightgreen', label='Median Fare')
+
+    # Fetch the bar positions
+    mean_positions = [bar.get_x() + bar.get_width() / 2 for bar in mean_bars.patches]
+    median_positions = [bar.get_x() + bar.get_width() / 2 for bar in median_bars.patches]
+
+    # Add annotations for mean and median values
+    for idx, (mean_height, median_height) in enumerate(zip(data[mean_col], data[median_col])):
+        # Annotate Mean Fare
+        plt.text(mean_positions[idx], mean_height + 1, f"${mean_height:.2f}", ha='center', fontsize=10, color='blue')
+
+        # Annotate Median Fare
+        plt.text(median_positions[idx], median_height + 1, f"${median_height:.2f}", ha='center', fontsize=10, color='green')
+
+    plt.title(title, fontsize=16, fontweight='bold')
+    plt.xlabel(xlabel, fontsize=14)
+    plt.ylabel(ylabel, fontsize=14)
+    plt.legend(title='Fare Type')
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.show()
