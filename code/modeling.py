@@ -11,6 +11,19 @@ import statsmodels.api as sm
 ## Time Series Modeling - Trend, Seasonality decomposition
 def decompose(dat, column):
     """
+    Decomposes a time series into its trend, seasonal, and residual components using STL decomposition.
+
+    Parameters:
+    -----------
+    dat : pandas.DataFrame
+        The input DataFrame containing the time series data.
+    column : str
+        The name of the column in the DataFrame that contains the datetime values.
+
+    Returns:
+    --------
+    pandas.Series
+        The seasonal component of the time series extracted using STL decomposition.
 
     """
     dat[column] = pd.to_datetime(dat[column])
