@@ -22,11 +22,6 @@ def boxplot(dat, xvar, yvar, title, xlabel, ylabel, x_order = None):
         The label for the Y-axis.
     x_order : list, optional
         The desired order of categories on the X-axis.
-
-    Returns:
-    -------
-    None
-        Displays the boxplot.
     """
     plt.figure(figsize = (10,10))
     sns.boxplot(x= xvar, y= yvar, data = dat, palette='Set3', order = x_order)
@@ -51,11 +46,6 @@ def heatmap(data, title, xlabel, ylabel):
         The label for the X-axis.
     ylabel : str
         The label for the Y-axis.
-
-    Returns:
-    -------
-    None
-        Displays the heatmap.
     """
     plt.figure(figsize=(12, 8))
     sns.heatmap(data, annot=True, fmt=".2f", cmap="YlGnBu", linewidths=0.5)
@@ -88,12 +78,8 @@ def lineplot(x, y, title, xlabel, ylabel, use_seaborn = False, data = None, hue 
         The input DataFrame for Seaborn plots. Required if `use_seaborn` is True.
     hue : str, optional
         The column name in `data` for grouping in Seaborn plots. Ignored if `use_seaborn` is False.
+        """
 
-    Returns:
-    -------
-    None
-        Displays the line plot.
-    """
     plt.figure(figsize=(16, 8))
     if use_seaborn:
         sns.lineplot(data=data,x=x,y=y,hue=hue, palette="tab10",linewidth=2)
@@ -161,11 +147,6 @@ def barplot_with_annotations(data, x, mean_col, median_col, title, xlabel, ylabe
         Label for the x-axis.
     ylabel : str
         Label for the y-axis.
-
-    Returns:
-    -------
-    None
-        Displays the bar chart with annotations.
     """
     plt.figure(figsize=(12, 8))
 
